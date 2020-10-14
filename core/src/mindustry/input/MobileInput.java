@@ -525,7 +525,8 @@ public class MobileInput extends InputHandler implements GestureListener{
         if(mode == none){
             Vec2 pos = Core.input.mouseWorld(x, y);
 
-            if(player.unit() instanceof Payloadc pay){
+            if(player.unit() instanceof Payloadc){
+                Payloadc pay = (Payloadc) player.unit();
                 Unit target = Units.closest(player.team(), pos.x, pos.y, 8f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(pos, u.hitSize + 8f));
                 if(target != null){
                     payloadTarget = target;
@@ -877,7 +878,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        if(payloadTarget != null && unit instanceof Payloadc pay){
+        if(payloadTarget != null && unit instanceof Payloadc){
+            Payloadc pay = (Payloadc) player.unit();
             targetPos.set(payloadTarget);
             attractDst = 0f;
 
@@ -885,10 +887,12 @@ public class MobileInput extends InputHandler implements GestureListener{
                 if(payloadTarget instanceof Vec2 && pay.hasPayload()){
                     //vec -> dropping something
                     tryDropPayload();
-                }else if(payloadTarget instanceof Building build && pay.canPickup(build)){
+                }else if(payloadTarget instanceof Building && pay.canPickup((Building) payloadTarget)){
+                    Building build = (Building) payloadTarget;
                     //building -> picking building up
                     Call.requestBuildPayload(player, build);
-                }else if(payloadTarget instanceof Unit other && pay.canPickup(other)){
+                }else if(payloadTarget instanceof Unit && pay.canPickup((Unit) payloadTarget)){
+                    Unit other = (Unit) payloadTarget;
                     //unit -> picking unit up
                     Call.requestUnitPayload(player, other);
                 }

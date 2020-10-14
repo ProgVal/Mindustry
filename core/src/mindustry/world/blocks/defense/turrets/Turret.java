@@ -191,13 +191,13 @@ public abstract class Turret extends Block{
 
         @Override
         public double sense(LAccess sensor){
-            return switch(sensor){
-                case rotation -> rotation;
-                case shootX -> targetPos.x;
-                case shootY -> targetPos.y;
-                case shooting -> (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : validateTarget()) ? 1 : 0;
-                default -> super.sense(sensor);
-            };
+            switch(sensor){
+                case rotation: return rotation;
+                case shootX: return targetPos.x;
+                case shootY: return targetPos.y;
+                case shooting: return (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : validateTarget()) ? 1 : 0;
+                default: return super.sense(sensor);
+            }
         }
 
         @Override

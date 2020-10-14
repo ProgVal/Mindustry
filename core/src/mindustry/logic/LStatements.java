@@ -156,37 +156,37 @@ public class LStatements{
                 s.setColor(table.color);
 
                 switch(type){
-                    case clear -> {
+                    case clear:
                         fields(s, "r", x, v -> x = v);
                         fields(s, "g", y, v -> y = v);
                         fields(s, "b", p1, v -> p1 = v);
-                    }
-                    case color -> {
+                        break;
+                    case color:
                         fields(s, "r", x, v -> x = v);
                         fields(s, "g", y, v -> y = v);
                         fields(s, "b", p1, v -> p1 = v);
                         row(s);
                         fields(s, "a", p2, v -> p2 = v);
-                    }
-                    case stroke -> {
+                        break;
+                    case stroke:
                         s.add().width(4);
                         fields(s, x, v -> x = v);
-                    }
-                    case line -> {
+                        break;
+                    case line:
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
                         row(s);
                         fields(s, "x2", p1, v -> p1 = v);
                         fields(s, "y2", p2, v -> p2 = v);
-                    }
-                    case rect, lineRect -> {
+                        break;
+                    case rect: case lineRect:
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
                         row(s);
                         fields(s, "width", p1, v -> p1 = v);
                         fields(s, "height", p2, v -> p2 = v);
-                    }
-                    case poly, linePoly -> {
+                        break;
+                    case poly: case linePoly:
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
                         row(s);
@@ -194,8 +194,8 @@ public class LStatements{
                         fields(s, "radius", p2, v -> p2 = v);
                         row(s);
                         fields(s, "rotation", p3, v -> p3 = v);
-                    }
-                    case triangle -> {
+                        break;
+                    case triangle:
                         fields(s, "x", x, v -> x = v);
                         fields(s, "y", y, v -> y = v);
                         row(s);
@@ -204,7 +204,7 @@ public class LStatements{
                         row(s);
                         fields(s, "x3", p3, v -> p3 = v);
                         fields(s, "y3", p4, v -> p4 = v);
-                    }
+                        break;
                 }
             }).expand().left();
         }
@@ -840,7 +840,7 @@ public class LStatements{
             }, Styles.logict, () -> {}).size(110, 40).color(table.color).left().padLeft(2);
 
             switch(locate){
-                case building -> {
+                case building:
                     row(table);
                     table.add(" type ").left();
                     table.button(b -> {
@@ -854,9 +854,9 @@ public class LStatements{
                     fields(table, enemy, str -> enemy = str);
 
                     table.row();
-                }
+                    break;
 
-                case ore -> {
+                case ore:
                     table.add(" ore ").left();
                     table.table(ts -> {
                         ts.color.set(table.color);
@@ -887,11 +887,12 @@ public class LStatements{
 
 
                     table.row();
-                }
 
-                case spawn, damaged -> {
+                    break;
+
+                case spawn: case damaged:
                     table.row();
-                }
+                    break;
             }
 
             table.add(" outX ").left();

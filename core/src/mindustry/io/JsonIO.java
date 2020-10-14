@@ -75,7 +75,7 @@ public class JsonIO{
 
         //TODO this is terrible
 
-        json.setSerializer(Sector.class, new Serializer<>(){
+        json.setSerializer(Sector.class, new Serializer<Sector>(){
             @Override
             public void write(Json json, Sector object, Class knownType){
                 json.writeValue(object.planet.name + "-" + object.id);
@@ -88,7 +88,7 @@ public class JsonIO{
             }
         });
 
-        json.setSerializer(SectorPreset.class, new Serializer<>(){
+        json.setSerializer(SectorPreset.class, new Serializer<SectorPreset>(){
             @Override
             public void write(Json json, SectorPreset object, Class knownType){
                 json.writeValue(object.name);
@@ -100,7 +100,7 @@ public class JsonIO{
             }
         });
 
-        json.setSerializer(Liquid.class, new Serializer<>(){
+        json.setSerializer(Liquid.class, new Serializer<Liquid>(){
             @Override
             public void write(Json json, Liquid object, Class knownType){
                 json.writeValue(object.name);
@@ -114,7 +114,7 @@ public class JsonIO{
             }
         });
 
-        json.setSerializer(Item.class, new Serializer<>(){
+        json.setSerializer(Item.class, new Serializer<Item>(){
             @Override
             public void write(Json json, Item object, Class knownType){
                 json.writeValue(object.name);
@@ -128,7 +128,7 @@ public class JsonIO{
             }
         });
 
-        json.setSerializer(Team.class, new Serializer<>(){
+        json.setSerializer(Team.class, new Serializer<Team>(){
             @Override
             public void write(Json json, Team object, Class knownType){
                 json.writeValue(object.id);
@@ -140,7 +140,7 @@ public class JsonIO{
             }
         });
 
-        json.setSerializer(Block.class, new Serializer<>(){
+        json.setSerializer(Block.class, new Serializer<Block>(){
             @Override
             public void write(Json json, Block object, Class knownType){
                 json.writeValue(object.name);
@@ -153,7 +153,7 @@ public class JsonIO{
             }
         });
 
-        json.setSerializer(Weather.class, new Serializer<>(){
+        json.setSerializer(Weather.class, new Serializer<Weather>(){
             @Override
             public void write(Json json, Weather object, Class knownType){
                 json.writeValue(object.name);
@@ -165,7 +165,7 @@ public class JsonIO{
             }
         });
 
-        json.setSerializer(ItemStack.class, new Serializer<>(){
+        json.setSerializer(ItemStack.class, new Serializer<ItemStack>(){
             @Override
             public void write(Json json, ItemStack object, Class knownType){
                 json.writeObjectStart();
@@ -180,7 +180,7 @@ public class JsonIO{
             }
         });
 
-        json.setSerializer(UnlockableContent.class, new Serializer<>(){
+        json.setSerializer(UnlockableContent.class, new Serializer<UnlockableContent>(){
             @Override
             public void write(Json json, UnlockableContent object, Class knownType){
                 json.writeValue(object.name);

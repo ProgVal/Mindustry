@@ -149,18 +149,26 @@ public interface Autotiler{
      */
     default void transformCase(int num, int[] bits){
         switch(num){
-            case 0 -> bits[0] = 3;
-            case 1 -> bits[0] = 4;
-            case 2 -> bits[0] = 2;
-            case 3 -> {
+            case 0:
+                bits[0] = 3;
+                break;
+            case 1:
+                bits[0] = 4;
+                break;
+            case 2:
+                bits[0] = 2;
+                break;
+            case 3:
                 bits[0] = 2;
                 bits[2] = -1;
-            }
-            case 4 -> {
+                break;
+            case 4:
                 bits[0] = 1;
                 bits[2] = -1;
-            }
-            case 5 -> bits[0] = 1;
+                break;
+            case 5:
+                bits[0] = 1;
+                break;
         }
     }
 

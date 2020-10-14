@@ -37,59 +37,70 @@ public class TypeIO{
     public static void writeObject(Writes write, Object object){
         if(object == null){
             write.b((byte)0);
-        }else if(object instanceof Integer i){
+        }else if(object instanceof Integer){
             write.b((byte)1);
-            write.i(i);
-        }else if(object instanceof Long l){
+            write.i((Integer) object);
+        }else if(object instanceof Long){
             write.b((byte)2);
-            write.l(l);
-        }else if(object instanceof Float f){
+            write.l((Long) object);
+        }else if(object instanceof Float){
             write.b((byte)3);
-            write.f(f);
-        }else if(object instanceof String s){
+            write.f((Float) object);
+        }else if(object instanceof String){
             write.b((byte)4);
-            writeString(write, s);
-        }else if(object instanceof Content map){
+            writeString(write, (String) object);
+        }else if(object instanceof Content){
+            Content map = (Content) object;
             write.b((byte)5);
             write.b((byte)map.getContentType().ordinal());
             write.s(map.id);
-        }else if(object instanceof IntSeq arr){
+        }else if(object instanceof IntSeq){
+            IntSeq arr = (IntSeq) object;
             write.b((byte)6);
             write.s((short)arr.size);
             for(int i = 0; i < arr.size; i++){
                 write.i(arr.items[i]);
             }
-        }else if(object instanceof Point2 p){
+        }else if(object instanceof Point2){
+            Point2 p = (Point2) object;
             write.b((byte)7);
             write.i(p.x);
             write.i(p.y);
-        }else if(object instanceof Point2[] p){
+        }else if(object instanceof Point2[]){
+            Point2[] p = (Point2[]) object;
             write.b((byte)8);
             write.b(p.length);
             for(Point2 point2 : p){
                 write.i(point2.pack());
             }
-        }else if(object instanceof TechNode map){
+        }else if(object instanceof TechNode){
+            TechNode map = (TechNode) object;
             write.b(9);
             write.b((byte)map.content.getContentType().ordinal());
             write.s(map.content.id);
-        }else if(object instanceof Boolean b){
+        }else if(object instanceof Boolean){
+            Boolean b = (Boolean) object;
             write.b((byte)10);
             write.bool(b);
-        }else if(object instanceof Double d){
+        }else if(object instanceof Double){
+            Double d = (Double) object;
             write.b((byte)11);
             write.d(d);
-        }else if(object instanceof Building b){
+        }else if(object instanceof Building){
+            Building b = (Building) object;
             write.b(12);
             write.i(b.pos());
-        }else if(object instanceof LAccess l){
+        }else if(object instanceof LAccess){
+            LAccess l = (LAccess) object;
             write.b((byte)13);
             write.s(l.ordinal());
-        }else if(object instanceof byte[] b){
+        }else if(object instanceof byte[]){
+            byte[] b = (byte[]) object;
             write.b((byte)14);
             write.i(b.length);
             write.b(b);
-        }else if(object instanceof UnitCommand c){
+        }else if(object instanceof UnitCommand){
+            UnitCommand c = (UnitCommand) object;
             write.b((byte)15);
             write.b(c.ordinal());
         }else{
@@ -290,13 +301,16 @@ public class TypeIO{
 
     public static void writeController(Writes write, UnitController control){
         //no real unit controller state is written, only the type
-        if(control instanceof Player p){
+        if(control instanceof Player){
+            Player p = (Player) control;
             write.b(0);
             write.i(p.id);
-        }else if(control instanceof FormationAI form){
+        }else if(control instanceof FormationAI){
+            FormationAI form = (FormationAI) control;
             write.b(1);
             write.i(form.leader.id);
-        }else if(control instanceof LogicAI logic && logic.controller != null){
+        }else if(control instanceof LogicAI && ((LogicAI) control).controller != null){
+            LogicAI logic = (LogicAI) control;
             write.b(3);
             write.i(logic.controller.pos());
         }else{
@@ -317,7 +331,8 @@ public class TypeIO{
             return prev instanceof FormationAI ? prev : new FormationAI(Groups.unit.getByID(id), null);
         }else if(type == 3){
             int pos = read.i();
-            if(prev instanceof LogicAI pai){
+            if(prev instanceof LogicAI){
+                LogicAI pai = (LogicAI) prev;
                 pai.controller = world.build(pos);
                 return pai;
             }else{

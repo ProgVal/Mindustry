@@ -152,10 +152,17 @@ public class OverlayRenderer{
 
         input.drawOverSelect();
 
-        if(ui.hudfrag.blockfrag.hover() instanceof Unit unit && unit.controller() instanceof LogicAI ai && ai.controller instanceof Building build){
-            Drawf.square(build.x, build.y, build.block.size * tilesize/2f + 2f);
-            if(!unit.within(build, unit.hitSize * 2f)){
-                Drawf.arrow(unit.x, unit.y, build.x, build.y, unit.hitSize *2f, 4f);
+        if(ui.hudfrag.blockfrag.hover() instanceof Unit) {
+            Unit unit = (Unit) ui.hudfrag.blockfrag.hover();
+            if (unit.controller() instanceof LogicAI) {
+                LogicAI ai = (LogicAI) unit.controller();
+                if (ai.controller instanceof Building){
+                    Building build = (Building) ai.controller;
+                    Drawf.square(build.x, build.y, build.block.size * tilesize/2f + 2f);
+                    if(!unit.within(build, unit.hitSize * 2f)){
+                        Drawf.arrow(unit.x, unit.y, build.x, build.y, unit.hitSize *2f, 4f);
+                    }
+                }
             }
         }
 

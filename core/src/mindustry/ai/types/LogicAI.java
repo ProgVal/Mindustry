@@ -63,13 +63,13 @@ public class LogicAI extends AIController{
         }
 
         switch(control){
-            case move -> {
+            case move:
                 moveTo(Tmp.v1.set(moveX, moveY), 1f, 30f);
-            }
-            case approach -> {
+                break;
+            case approach:
                 moveTo(Tmp.v1.set(moveX, moveY), moveRad - 8f, 8f);
-            }
-            case pathfind -> {
+                break;
+            case pathfind:
                 Building core = unit.closestEnemyCore();
 
                 if((core == null || !unit.within(core, unit.range() * 0.5f)) && command() == UnitCommand.attack){
@@ -90,12 +90,13 @@ public class LogicAI extends AIController{
                         pathfind(Pathfinder.fieldRally);
                     }
                 }
-            }
-            case stop -> {
-                if(unit instanceof Builderc build){
+                break;
+            case stop:
+                if(unit instanceof Builderc){
+                    Builderc build = (Builderc) unit;
                     build.clearBuilding();
                 }
-            }
+                break;
         }
 
         if(unit.type().canBoost && !unit.type().flying){
@@ -135,10 +136,10 @@ public class LogicAI extends AIController{
     //always aim for the main target
     @Override
     protected Teamc target(float x, float y, float range, boolean air, boolean ground){
-        return switch(aimControl){
-            case target -> posTarget;
-            case targetp -> mainTarget;
-            default -> null;
-        };
+        switch(aimControl) {
+            case target: return posTarget;
+            case targetp: return mainTarget;
+            default: return null;
+        }
     }
 }

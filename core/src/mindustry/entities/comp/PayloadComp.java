@@ -86,10 +86,10 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
             return true;
         }
 
-        if(payload instanceof BuildPayload b){
-            return dropBlock(b);
-        }else if(payload instanceof UnitPayload p){
-            return dropUnit(p);
+        if(payload instanceof BuildPayload){
+            return dropBlock((BuildPayload) payload);
+        }else if(payload instanceof UnitPayload){
+            return dropUnit((UnitPayload) payload);
         }
         return false;
     }
