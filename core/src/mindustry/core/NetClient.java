@@ -106,9 +106,15 @@ public class NetClient implements ApplicationListener{
 
             if(packet.reason != null){
                 switch(packet.reason){
-                    case "closed" -> ui.showSmall("@disconnect", "@disconnect.closed");
-                    case "timeout" -> ui.showSmall("@disconnect", "@disconnect.timeout");
-                    case "error" -> ui.showSmall("@disconnect", "@disconnect.error");
+                    case "closed":
+                        ui.showSmall("@disconnect", "@disconnect.closed");
+                        break;
+                    case "timeout":
+                        ui.showSmall("@disconnect", "@disconnect.timeout");
+                        break;
+                    case "error":
+                        ui.showSmall("@disconnect", "@disconnect.error");
+                        break;
                 }
             }else{
                 ui.showErrorMessage("@disconnect");

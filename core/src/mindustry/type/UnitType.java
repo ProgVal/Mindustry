@@ -177,7 +177,8 @@ public class UnitType extends UnlockableContent{
     public void getDependencies(Cons<UnlockableContent> cons){
         //units require reconstructors being researched
         for(Block block : content.blocks()){
-            if(block instanceof Reconstructor r){
+            if(block instanceof Reconstructor){
+                Reconstructor r = (Reconstructor) block;
                 for(UnitType[] recipe : r.upgrades){
                     //result of reconstruction is this, so it must be a dependency
                     if(recipe[1] == this){

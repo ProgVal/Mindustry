@@ -147,7 +147,8 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void overwrote(Seq<Building> builds){
-            if(builds.first() instanceof ConveyorBuild build){
+            if(builds.first() instanceof ConveyorBuild){
+                ConveyorBuild build = (ConveyorBuild) builds.first();
                 ids = build.ids.clone();
                 xs = build.xs.clone();
                 ys = build.ys.clone();

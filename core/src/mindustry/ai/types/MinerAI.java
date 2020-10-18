@@ -17,7 +17,8 @@ public class MinerAI extends AIController{
     protected void updateMovement(){
         Building core = unit.closestCore();
 
-        if(!(unit instanceof Minerc miner) || core == null) return;
+        if(!(unit instanceof Minerc) || core == null) return;
+        Minerc miner = (Minerc) unit;
 
         if(miner.mineTile() != null && !miner.mineTile().within(unit, unit.type.range)){
             miner.mineTile(null);

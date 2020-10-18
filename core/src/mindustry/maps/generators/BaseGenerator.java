@@ -188,7 +188,8 @@ public class BaseGenerator{
             }
         }
 
-        if(part.required instanceof Item item){
+        if(part.required instanceof Item){
+            Item item = (Item) part.required;
             for(Stile tile : result.tiles){
                 if(tile.block instanceof Drill){
 
@@ -211,7 +212,8 @@ public class BaseGenerator{
         Schematics.place(result, cx + result.width/2, cy + result.height/2, team);
 
         //fill drills with items after placing
-        if(part.required instanceof Item item){
+        if(part.required instanceof Item){
+            Item item = (Item) part.required;
             for(Stile tile : result.tiles){
                 if(tile.block instanceof Drill){
 

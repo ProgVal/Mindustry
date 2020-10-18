@@ -5,6 +5,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
+import mindustry.ai.Pathfinder.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
@@ -103,7 +104,7 @@ public class SectorDamage{
             allies.sort(u -> u.dst2(spawn));
 
             //damage units one by one, not uniformly
-            for(var u : allies){
+            for(Unit u : allies){
                 if(u.health < unitDamage){
                     u.remove();
                     unitDamage -= u.health;
@@ -148,7 +149,7 @@ public class SectorDamage{
         Tile start = spawns.first();
 
         Time.mark();
-        var field = pathfinder.getField(state.rules.waveTeam, Pathfinder.costGround, Pathfinder.fieldCore);
+        Flowfield field = pathfinder.getField(state.rules.waveTeam, Pathfinder.costGround, Pathfinder.fieldCore);
         Seq<Tile> path = new Seq<>();
         boolean found = false;
 
@@ -228,16 +229,20 @@ public class SectorDamage{
         for(Building build : Groups.build){
             float e = build.efficiency();
             if(e > 0.08f){
-                if(build.team == state.rules.defaultTeam && build instanceof Ranged ranged && sparse.contains(t -> t.within(build, ranged.range()))){
-                    if(build.block instanceof Turret t && build instanceof TurretBuild b && b.hasAmmo()){
+                if(build.team == state.rules.defaultTeam && build instanceof Ranged && sparse.contains(t -> t.within(build, ((Ranged) build).range()))){
+                    if(build.block instanceof Turret && build instanceof TurretBuild && ((TurretBuild) build).hasAmmo()){
+                        Turret t = (Turret) build.block;
+                        TurretBuild b = (TurretBuild) build;
                         sumDps += t.shots / t.reloadTime * 60f * b.peekAmmo().estimateDPS() * e;
                     }
 
-                    if(build.block instanceof MendProjector m){
+                    if(build.block instanceof MendProjector){
+                        MendProjector m = (MendProjector) build.block;
                         sumRps += m.healPercent / m.reload * avgHealth * 60f / 100f * e;
                     }
 
-                    if(build.block instanceof ForceProjector f){
+                    if(build.block instanceof ForceProjector){
+                        ForceProjector f = (ForceProjector) build.block;
                         sumHealth += f.breakage * e;
                         sumRps += 1f * e;
                     }
@@ -258,7 +263,9 @@ public class SectorDamage{
 
                 sumHealth += unit.health*healthMult + unit.shield;
                 sumDps += unit.type.dpsEstimate;
-                if(unit.abilities.find(a -> a instanceof HealFieldAbility) instanceof HealFieldAbility h){
+                Ability ability = unit.abilities.find(a -> a instanceof HealFieldAbility);
+                if(ability instanceof HealFieldAbility){
+                    HealFieldAbility h = (HealFieldAbility) ability;
                     sumRps += h.amount / h.reload * 60f;
                 }
             }else{
@@ -268,7 +275,7 @@ public class SectorDamage{
         }
 
         //calculate DPS and health for the next few waves and store in list
-        var reg = new LinearRegression();
+        LinearRegression reg = new LinearRegression();
         Seq<Vec2> waveDps = new Seq<>(), waveHealth = new Seq<>();
 
         for(int wave = state.wave, i = 0; i < 3; wave += (1 + i++)){

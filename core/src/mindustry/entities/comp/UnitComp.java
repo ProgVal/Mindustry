@@ -83,38 +83,57 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     public double sense(LAccess sensor){
-        return switch(sensor){
-            case totalItems -> stack().amount;
-            case itemCapacity -> type.itemCapacity;
-            case rotation -> rotation;
-            case health -> health;
-            case maxHealth -> maxHealth;
-            case ammo -> state.rules.unitAmmo ? type.ammoCapacity : ammo;
-            case ammoCapacity -> type.ammoCapacity;
-            case x -> World.conv(x);
-            case y -> World.conv(y);
-            case team -> team.id;
-            case shooting -> isShooting() ? 1 : 0;
-            case shootX -> World.conv(aimX());
-            case shootY -> World.conv(aimY());
-            case flag -> flag;
-            case payloadCount -> self() instanceof Payloadc pay ? pay.payloads().size : 0;
-            default -> 0;
-        };
+        switch(sensor){
+            case totalItems: return stack().amount;
+            case itemCapacity: return type.itemCapacity;
+            case rotation: return rotation;
+            case health: return health;
+            case maxHealth: return maxHealth;
+            case ammo: return state.rules.unitAmmo ? type.ammoCapacity : ammo;
+            case ammoCapacity: return type.ammoCapacity;
+            case x: return World.conv(x);
+            case y: return World.conv(y);
+            case team: return team.id;
+            case shooting: return isShooting() ? 1 : 0;
+            case shootX: return World.conv(aimX());
+            case shootY: return World.conv(aimY());
+            case flag: return flag;
+            case payloadCount: return self() instanceof Payloadc ? ((Payloadc) self()).payloads().size : 0;
+            default: return 0;
+        }
     }
 
     @Override
     public Object senseObject(LAccess sensor){
-        return switch(sensor){
-            case type -> type;
-            case name -> controller instanceof Player p ? p.name : null;
-            case firstItem -> stack().amount == 0 ? null : item();
-            case payloadType -> self() instanceof Payloadc pay ?
-                (pay.payloads().isEmpty() ? null :
-                pay.payloads().peek() instanceof UnitPayload p1 ? p1.unit.type :
-                pay.payloads().peek() instanceof BuildPayload p2 ? p2.block() : null) : null;
-            default -> noSensed;
-        };
+        switch(sensor){
+            case type: return type;
+            case name: return controller instanceof Player ? ((Player) controller).name : null;
+            case firstItem: return stack().amount == 0 ? null : item();
+            case payloadType: 
+                if (self() instanceof Payloadc) {
+                    Payloadc pay = (Payloadc) self();
+                    if (pay.payloads().isEmpty()) {
+                        return null;
+                    }
+                    else {
+                        if (pay.payloads().peek() instanceof UnitPayload) {
+                            UnitPayload p1 = (UnitPayload) pay.payloads().peek();
+                            return p1.unit.type;
+                        }
+                        else if (pay.payloads().peek() instanceof BuildPayload) {
+                            BuildPayload p2 = (BuildPayload) pay.payloads().peek();
+                            return p2.block();
+                        }
+                        else {
+                            return null;
+                        }
+                    }
+                }
+                else {
+                    return null;
+                }
+            default: return noSensed;
+        }
 
     }
 

@@ -40,7 +40,7 @@ public class ContentParser{
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
     ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class);
 
-    ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
+    ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<Class<?>, FieldParser>(){{
         put(Effect.class, (type, data) -> field(Fx.class, data));
         put(Schematic.class, (type, data) -> {
             Object result = fieldOpt(Loadouts.class, data);
@@ -274,11 +274,13 @@ public class ContentParser{
 
                     UnitReq req = parser.readValue(UnitReq.class, rec);
 
-                    if(req.block instanceof Reconstructor r){
+                    if(req.block instanceof Reconstructor){
+                        Reconstructor r = (Reconstructor) req.block;
                         if(req.previous != null){
                             r.upgrades.add(new UnitType[]{req.previous, unit});
                         }
-                    }else if(req.block instanceof UnitFactory f){
+                    }else if(req.block instanceof UnitFactory){
+                        UnitFactory f = (UnitFactory) req.block;
                         f.plans.add(new UnitPlan(unit, req.time, req.requirements));
                     }else{
                         throw new IllegalArgumentException("Missing a valid 'block' in 'requirements'");
@@ -602,7 +604,8 @@ public class ContentParser{
         }
 
 
-        if(object instanceof UnlockableContent unlock && research != null){
+        if(object instanceof UnlockableContent && research != null){
+            UnlockableContent unlock = (UnlockableContent) object;
 
             //add research tech node
             String researchName;

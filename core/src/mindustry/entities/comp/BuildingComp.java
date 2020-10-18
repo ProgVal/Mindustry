@@ -197,7 +197,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void addPlan(boolean checkPrevious){
         if(!block.rebuildable) return;
 
-        if(self() instanceof ConstructBuild entity){
+        if(self() instanceof ConstructBuild){
+            ConstructBuild entity = (ConstructBuild) self();
             //update block to reflect the fact that something was being constructed
             if(entity.cblock != null && entity.cblock.synthetic()){
                 block = entity.cblock;
@@ -1266,39 +1267,50 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     @Override
     public double sense(LAccess sensor){
-        return switch(sensor){
-            case x -> World.conv(x);
-            case y -> World.conv(y);
-            case team -> team.id;
-            case health -> health;
-            case maxHealth -> maxHealth;
-            case efficiency -> efficiency();
-            case rotation -> rotation;
-            case totalItems -> items == null ? 0 : items.total();
-            case totalLiquids -> liquids == null ? 0 : liquids.total();
-            case totalPower -> power == null || !block.consumes.hasPower() ? 0 : power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
-            case itemCapacity -> block.itemCapacity;
-            case liquidCapacity -> block.liquidCapacity;
-            case powerCapacity -> block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
-            case powerNetIn -> power == null ? 0 : power.graph.getLastScaledPowerIn() * 60;
-            case powerNetOut -> power == null ? 0 : power.graph.getLastScaledPowerOut() * 60;
-            case powerNetStored -> power == null ? 0 : power.graph.getLastPowerStored();
-            case powerNetCapacity -> power == null ? 0 : power.graph.getLastCapacity();
-            case enabled -> enabled ? 1 : 0;
-            case payloadCount -> getPayload() != null ? 1 : 0;
-            default -> 0;
-        };
+        switch(sensor){
+            case x: return World.conv(x);
+            case y: return World.conv(y);
+            case team: return team.id;
+            case health: return health;
+            case maxHealth: return maxHealth;
+            case efficiency: return efficiency();
+            case rotation: return rotation;
+            case totalItems: return items == null ? 0 : items.total();
+            case totalLiquids: return liquids == null ? 0 : liquids.total();
+            case totalPower: return power == null || !block.consumes.hasPower() ? 0 : power.status * (block.consumes.getPower().buffered ? block.consumes.getPower().capacity : 1f);
+            case itemCapacity: return block.itemCapacity;
+            case liquidCapacity: return block.liquidCapacity;
+            case powerCapacity: return block.consumes.hasPower() ? block.consumes.getPower().capacity : 0f;
+            case powerNetIn: return power == null ? 0 : power.graph.getLastScaledPowerIn() * 60;
+            case powerNetOut: return power == null ? 0 : power.graph.getLastScaledPowerOut() * 60;
+            case powerNetStored: return power == null ? 0 : power.graph.getLastPowerStored();
+            case powerNetCapacity: return power == null ? 0 : power.graph.getLastCapacity();
+            case enabled: return enabled ? 1 : 0;
+            case payloadCount: return getPayload() != null ? 1 : 0;
+            default: return 0;
+        }
     }
 
     @Override
     public Object senseObject(LAccess sensor){
-        return switch(sensor){
-            case type -> block;
-            case firstItem -> items == null ? null : items.first();
-            case config -> block.configurations.containsKey(Item.class) || block.configurations.containsKey(Liquid.class) ? config() : null;
-            case payloadType -> getPayload() instanceof UnitPayload p1 ? p1.unit.type : getPayload() instanceof BuildPayload p2 ? p2.block() : null;
-            default -> noSensed;
-        };
+        switch(sensor){
+            case type: return block;
+            case firstItem: return items == null ? null : items.first();
+            case config: return block.configurations.containsKey(Item.class) || block.configurations.containsKey(Liquid.class) ? config() : null;
+            case payloadType:
+                if (getPayload() instanceof UnitPayload) {
+                    UnitPayload p1 = (UnitPayload) getPayload();
+                    return p1.unit.type;
+                }
+                else if (getPayload() instanceof BuildPayload) {
+                    BuildPayload p2 = (BuildPayload) getPayload();
+                    return p2.block();
+                }
+                else {
+                    return null;
+                }
+            default: return noSensed;
+        }
 
     }
 

@@ -187,7 +187,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.server, called = Loc.server)
     public static void pickedUnitPayload(Unit unit, Unit target){
-        if(target != null && unit instanceof Payloadc pay){
+        if(target != null && unit instanceof Payloadc){
+            Payloadc pay = (Payloadc) unit;
             pay.pickup(target);
         }else if(target != null){
             target.remove();
@@ -196,7 +197,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.server, called = Loc.server)
     public static void pickedBuildPayload(Unit unit, Building tile, boolean onGround){
-        if(tile != null && unit instanceof Payloadc pay){
+        if(tile != null && unit instanceof Payloadc){
+            Payloadc pay = (Payloadc) unit;
             if(onGround){
                 if(tile.block.buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
                     pay.pickup(tile);
@@ -236,7 +238,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(called = Loc.server, targets = Loc.server)
     public static void payloadDropped(Unit unit, float x, float y){
-        if(unit instanceof Payloadc pay){
+        if(unit instanceof Payloadc){
+            Payloadc pay = (Payloadc) unit;
             float prevx = pay.x(), prevy = pay.y();
             pay.set(x, y);
             pay.dropLastPayload();
@@ -362,7 +365,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(targets = Loc.both, called = Loc.server, forward = true)
     public static void unitCommand(Player player){
-        if(player == null || player.dead() || !(player.unit() instanceof Commanderc commander)) return;
+        if(player == null || player.dead() || !(player.unit() instanceof Commanderc)) return;
+        Commanderc commander = player.unit();
 
         if(commander.isCommanding()){
             commander.clearCommand();
@@ -436,7 +440,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void tryPickupPayload(){
         Unit unit = player.unit();
-        if(!(unit instanceof Payloadc pay)) return;
+        if(!(unit instanceof Payloadc)) return;
+        Payloadc pay = (Payloadc) unit;
 
         Unit target = Units.closest(player.team(), pay.x(), pay.y(), unit.type.hitSize * 2.5f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
         if(target != null){

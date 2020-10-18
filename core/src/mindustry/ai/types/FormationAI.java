@@ -59,7 +59,9 @@ public class FormationAI extends AIController implements FormationMember{
             unit.moveAt(realtarget.sub(unit).limit(type.speed));
         }
 
-        if(unit instanceof Minerc mine && leader instanceof Minerc com){
+        if(unit instanceof Minerc && leader instanceof Minerc){
+            Minerc mine = (Minerc) unit;
+            Minerc com = (Minerc) leader;
             if(mine.validMine(com.mineTile())){
                 mine.mineTile(com.mineTile());
 
@@ -78,7 +80,9 @@ public class FormationAI extends AIController implements FormationMember{
 
         }
 
-        if(unit instanceof Builderc build && leader instanceof Builderc com && com.activelyBuilding()){
+        if(unit instanceof Builderc && leader instanceof Builderc && ((Builderc) leader).activelyBuilding()){
+            Builderc build = (Builderc) unit;
+            Builderc com = (Builderc) leader;
             build.clearBuilding();
             build.addBuild(com.buildPlan());
         }

@@ -38,10 +38,10 @@ public class SuicideAI extends GroundAI{
             }
 
             //do not move toward walls or transport blocks
-            if(!(target instanceof Building build && (
-                build.block.group == BlockGroup.walls ||
-                build.block.group == BlockGroup.liquids ||
-                build.block.group == BlockGroup.transportation
+            if(!(target instanceof Building && (
+                ((Building) target).block.group == BlockGroup.walls ||
+                ((Building) target).block.group == BlockGroup.liquids ||
+                ((Building) target).block.group == BlockGroup.transportation
             ))){
                 blockedByBlock = false;
 

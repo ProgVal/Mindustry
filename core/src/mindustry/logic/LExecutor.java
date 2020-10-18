@@ -187,8 +187,9 @@ public class LExecutor{
         public void run(LExecutor exec){
 
             //binding to `null` was previously possible, but was too powerful and exploitable
-            if(exec.obj(type) instanceof UnitType type){
-                Seq<Unit> seq = exec.team.data().unitCache(type);
+            if(exec.obj(type) instanceof UnitType){
+                UnitType unit_type = (UnitType) exec.obj(type);
+                Seq<Unit> seq = exec.team.data().unitCache(unit_type);
 
                 if(seq != null && seq.any()){
                     index %= seq.size;
@@ -232,7 +233,8 @@ public class LExecutor{
             Object unitObj = exec.obj(varUnit);
             LogicAI ai = UnitControlI.checkLogicAI(exec, unitObj);
 
-            if(unitObj instanceof Unit unit && ai != null){
+            if(unitObj instanceof Unit && ai != null){
+                Unit unit = (Unit) unitObj;
                 ai.controlTimer = LogicAI.logicControlTimeout;
 
                 Cache cache = (Cache)ai.execCache.get(this, Cache::new);
@@ -242,23 +244,24 @@ public class LExecutor{
                     boolean build = false;
 
                     switch(locate){
-                        case ore -> {
-                            if(exec.obj(ore) instanceof Item item){
+                        case ore:
+                            if(exec.obj(ore) instanceof Item){
+                                Item item = (Item) exec.obj(ore);
                                 res = indexer.findClosestOre(unit.x, unit.y, item);
                             }
-                        }
-                        case building -> {
+                            break;
+                        case building:
                             res = Geometry.findClosest(unit.x, unit.y, exec.bool(enemy) ? indexer.getEnemy(unit.team, flag) : indexer.getAllied(unit.team, flag));
                             build = true;
-                        }
-                        case spawn -> {
+                            break;
+                        case spawn:
                             res = Geometry.findClosest(unit.x, unit.y, Vars.spawner.getSpawns());
-                        }
-                        case damaged -> {
+                            break;
+                        case damaged:
                             Building b = Units.findDamagedTile(unit.team, unit.x, unit.y);
                             res = b == null ? null : b.tile;
                             build = true;
-                        }
+                            break;
                     }
 
                     if(res != null && (!build || res.build != null)){
@@ -304,23 +307,28 @@ public class LExecutor{
         /** Checks is a unit is valid for logic AI control, and returns the controller. */
         @Nullable
         public static LogicAI checkLogicAI(LExecutor exec, Object unitObj){
-            if(unitObj instanceof Unit unit && exec.obj(varUnit) == unit && unit.team == exec.team && !unit.isPlayer() && !(unit.controller() instanceof FormationAI)){
-                if(!(unit.controller() instanceof LogicAI)){
-                    unit.controller(new LogicAI());
-                    ((LogicAI)unit.controller()).controller = exec.building(varThis);
+            if(unitObj instanceof Unit) {
+                Unit unit = (Unit) unitObj;
+                if (exec.obj(varUnit) == unit && unit.team == exec.team && !unit.isPlayer() && !(unit.controller() instanceof FormationAI)){
+                    if(!(unit.controller() instanceof LogicAI)){
+                        unit.controller(new LogicAI());
+                        ((LogicAI)unit.controller()).controller = exec.building(varThis);
 
-                    //clear old state
-                    if(unit instanceof Minerc miner){
-                        miner.mineTile(null);
+                        //clear old state
+                        if(unit instanceof Minerc){
+                            Minerc miner =(Minerc) unit;
+                            miner.mineTile(null);
+                        }
+
+                        if(unit instanceof Builderc){
+                            Builderc builder = (Builderc) unit;
+                            builder.clearBuilding();
+                        }
+
+                        return (LogicAI)unit.controller();
                     }
-
-                    if(unit instanceof Builderc builder){
-                        builder.clearBuilding();
-                    }
-
                     return (LogicAI)unit.controller();
                 }
-                return (LogicAI)unit.controller();
             }
             return null;
         }
@@ -331,12 +339,15 @@ public class LExecutor{
             LogicAI ai = checkLogicAI(exec, unitObj);
 
             //only control standard AI units
-            if(unitObj instanceof Unit unit && ai != null){
+            if(unitObj instanceof Unit && ai != null){
+                Unit unit = (Unit) unitObj;
                 ai.controlTimer = LogicAI.logicControlTimeout;
                 float x1 = World.unconv(exec.numf(p1)), y1 = World.unconv(exec.numf(p2)), d1 = World.unconv(exec.numf(p3));
+                Building build;
+                int amount;
 
                 switch(type){
-                    case move, stop, approach -> {
+                    case move: case stop: case approach:
                         ai.control = type;
                         ai.moveX = x1;
                         ai.moveY = y1;
@@ -346,55 +357,59 @@ public class LExecutor{
 
                         //stop mining/building
                         if(type == LUnitControl.stop){
-                            if(unit instanceof Minerc miner){
+                            if(unit instanceof Minerc){
+                                Minerc miner = (Minerc) unit;
                                 miner.mineTile(null);
                             }
-                            if(unit instanceof Builderc build){
-                                build.clearBuilding();
+                            if(unit instanceof Builderc){
+                                Builderc builder = (Builderc) unit;
+                                builder.clearBuilding();
                             }
                         }
-                    }
-                    case within -> {
+                        break;
+                    case within:
                         exec.setnum(p4, unit.within(x1, y1, d1) ? 1 : 0);
-                    }
-                    case pathfind -> {
+                        break;
+                    case pathfind:
                         ai.control = type;
-                    }
-                    case target -> {
+                        break;
+                    case target:
                         ai.posTarget.set(x1, y1);
                         ai.aimControl = type;
                         ai.mainTarget = null;
                         ai.shoot = exec.bool(p3);
-                    }
-                    case targetp -> {
+                        break;
+                    case targetp:
                         ai.aimControl = type;
-                        ai.mainTarget = exec.obj(p1) instanceof Teamc t ? t : null;
+                        ai.mainTarget = exec.obj(p1) instanceof Teamc ? (Teamc) exec.obj(p1) : null;
                         ai.shoot = exec.bool(p2);
-                    }
-                    case boost -> {
+                        break;
+                    case boost:
                         ai.boost = exec.bool(p1);
-                    }
-                    case flag -> {
+                        break;
+                    case flag:
                         unit.flag = exec.num(p1);
-                    }
-                    case mine -> {
+                        break;
+                    case mine:
                         Tile tile = world.tileWorld(x1, y1);
-                        if(unit instanceof Minerc miner){
+                        if(unit instanceof Minerc){
+                            Minerc miner = (Minerc) unit;
                             miner.mineTile(miner.validMine(tile) ? tile : null);
                         }
-                    }
-                    case payDrop -> {
+                        break;
+                    case payDrop:
                         if(ai.payTimer > 0) return;
 
-                        if(unit instanceof Payloadc pay && pay.hasPayload()){
+                        if(unit instanceof Payloadc && ((Payloadc) unit).hasPayload()){
                             Call.payloadDropped(unit, unit.x, unit.y);
                             ai.payTimer = LogicAI.transferDelay;
                         }
-                    }
-                    case payTake -> {
+                        break;
+                    case payTake:
                         if(ai.payTimer > 0) return;
 
-                        if(unit instanceof Payloadc pay){
+                        if(unit instanceof Payloadc){
+                            Payloadc pay = (Payloadc) unit;
                             //units
                             if(exec.bool(p1)){
                                 Unit result = Units.closest(unit.team, unit.x, unit.y, unit.type.hitSize * 2f, u -> u.isAI() && u.isGrounded() && pay.canPickup(u) && u.within(unit, u.hitSize + unit.hitSize * 1.2f));
@@ -403,25 +418,27 @@ public class LExecutor{
                                     Call.pickedUnitPayload(unit, result);
                                 }
                             }else{ //buildings
-                                Building tile = world.buildWorld(unit.x, unit.y);
+                                Building tile2 = world.buildWorld(unit.x, unit.y);
 
                                 //TODO copy pasted code
-                                if(tile != null && tile.team == unit.team){
-                                    if(tile.block.buildVisibility != BuildVisibility.hidden && tile.canPickup() && pay.canPickup(tile)){
-                                        Call.pickedBuildPayload(unit, tile, true);
+                                if(tile2 != null && tile2.team == unit.team){
+                                    if(tile2.block.buildVisibility != BuildVisibility.hidden && tile2.canPickup() && pay.canPickup(tile2)){
+                                        Call.pickedBuildPayload(unit, tile2, true);
                                     }else{ //pick up block payload
-                                        Payload current = tile.getPayload();
+                                        Payload current = tile2.getPayload();
                                         if(current != null && pay.canPickupPayload(current)){
-                                            Call.pickedBuildPayload(unit, tile, false);
+                                            Call.pickedBuildPayload(unit, tile2, false);
                                         }
                                     }
                                 }
                             }
                             ai.payTimer = LogicAI.transferDelay;
                         }
-                    }
-                    case build -> {
-                        if(unit instanceof Builderc builder && exec.obj(p3) instanceof Block block){
+                        break;
+                    case build:
+                        if(unit instanceof Builderc && exec.obj(p3) instanceof Block){
+                            Builderc builder = (Builderc) unit;
+                            Block block = (Block) exec.obj(p3);
                             int x = World.toTile(x1), y = World.toTile(y1);
                             int rot = exec.numi(p4);
 
@@ -441,25 +458,25 @@ public class LExecutor{
                                 builder.addBuild(ai.plan);
                             }
                         }
-                    }
-                    case getBlock -> {
+                        break;
+                    case getBlock:
                         float range = Math.max(unit.range(), buildingRange);
                         if(!unit.within(x1, y1, range)){
                             exec.setobj(p3, null);
                             exec.setnum(p4, 0);
                         }else{
-                            Tile tile = world.tileWorld(x1, y1);
+                            Tile tile2 = world.tileWorld(x1, y1);
                             //any environmental solid block is returned as StoneWall, aka "@solid"
-                            Block block = tile == null ? null : !tile.synthetic() ? (tile.solid() ? Blocks.stoneWall : Blocks.air) : tile.block();
+                            Block block = tile2 == null ? null : !tile2.synthetic() ? (tile2.solid() ? Blocks.stoneWall : Blocks.air) : tile2.block();
                             exec.setobj(p3, block);
-                            exec.setnum(p4, tile != null && tile.build != null ? tile.build.rotation : 0);
+                            exec.setnum(p4, tile2 != null && tile2.build != null ? tile2.build.rotation : 0);
                         }
-                    }
-                    case itemDrop -> {
+                        break;
+                    case itemDrop:
                         if(ai.itemTimer > 0) return;
 
-                        Building build = exec.building(p1);
-                        int amount = exec.numi(p2);
+                        build = exec.building(p1);
+                        amount = exec.numi(p2);
                         int dropped = Math.min(unit.stack.amount, amount);
                         if(build != null && dropped > 0 && unit.within(build, logicItemTransferRange)){
                             int accepted = build.acceptStack(unit.item(), dropped, unit);
@@ -468,14 +485,15 @@ public class LExecutor{
                                 ai.itemTimer = LogicAI.transferDelay;
                             }
                         }
-                    }
-                    case itemTake -> {
+                        break;
+                    case itemTake:
                         if(ai.itemTimer > 0) return;
 
-                        Building build = exec.building(p1);
-                        int amount = exec.numi(p3);
+                        build = (Building) exec.building(p1);
+                        amount = exec.numi(p3);
 
-                        if(build != null && exec.obj(p2) instanceof Item item && unit.within(build, logicItemTransferRange)){
+                        if(build != null && exec.obj(p2) instanceof Item && unit.within(build, logicItemTransferRange)){
+                            Item item = (Item) exec.obj(p2);
                             int taken = Math.min(build.items.get(item), Math.min(amount, unit.maxAccepted(item)));
 
                             if(taken > 0){
@@ -483,8 +501,8 @@ public class LExecutor{
                                 ai.itemTimer = LogicAI.transferDelay;
                             }
                         }
-                    }
-                    default -> {}
+                        break;
+                    default: break;
                 }
             }
         }
@@ -510,7 +528,8 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
             Object obj = exec.obj(target);
-            if(obj instanceof Controllable cont){
+            if(obj instanceof Controllable){
+                Controllable cont = (Controllable) obj;
                 if(type.isObj){
                     cont.control(type, exec.obj(p1), exec.num(p2), exec.num(p3), exec.num(p4));
                 }else{
@@ -556,7 +575,8 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild mem){
+            if(from instanceof MemoryBuild){
+                MemoryBuild mem = (MemoryBuild) from;
 
                 exec.setnum(output, address < 0 || address >= mem.memory.length ? 0 : mem.memory[address]);
             }
@@ -580,7 +600,8 @@ public class LExecutor{
             int address = exec.numi(position);
             Building from = exec.building(target);
 
-            if(from instanceof MemoryBuild mem){
+            if(from instanceof MemoryBuild){
+                MemoryBuild mem = (MemoryBuild) from;
 
                 if(address >= 0 && address < mem.memory.length){
                     mem.memory[address] = exec.num(value);
@@ -607,7 +628,8 @@ public class LExecutor{
             Object target = exec.obj(from);
             Object sense = exec.obj(type);
 
-            if(target instanceof Senseable se){
+            if(target instanceof Senseable){
+                Senseable se = (Senseable) target;
                 if(sense instanceof Content){
                     exec.setnum(to, se.sense(((Content)sense)));
                 }else if(sense instanceof LAccess){
@@ -660,8 +682,9 @@ public class LExecutor{
             int sortDir = exec.bool(sortOrder) ? 1 : -1;
             LogicAI ai = null;
 
-            if(base instanceof Ranged r && r.team() == exec.team &&
+            if(base instanceof Ranged && ((Ranged) base).team() == exec.team &&
                 (base instanceof Building || (ai = UnitControlI.checkLogicAI(exec, base)) != null)){ //must be a building or a controllable unit
+                Ranged r = (Ranged) base;
                 float range = r.range();
 
                 Healthc targeted;
@@ -838,7 +861,8 @@ public class LExecutor{
             if(Vars.headless) return;
 
             Building build = exec.building(target);
-            if(build instanceof LogicDisplayBuild d){
+            if(build instanceof LogicDisplayBuild){
+                LogicDisplayBuild d = (LogicDisplayBuild) build;
                 if(d.commands.size + exec.graphicsBuffer.size < maxDisplayBuffer){
                     for(int i = 0; i < exec.graphicsBuffer.size; i++){
                         d.commands.addLast(exec.graphicsBuffer.items[i]);
@@ -900,7 +924,8 @@ public class LExecutor{
         public void run(LExecutor exec){
 
             Building build = exec.building(target);
-            if(build instanceof MessageBuild d){
+            if(build instanceof MessageBuild){
+                MessageBuild d = (MessageBuild) build;
 
                 d.message.setLength(0);
                 d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), maxTextBuffer));

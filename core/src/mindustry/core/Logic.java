@@ -249,7 +249,8 @@ public class Logic implements ApplicationListener{
     //called when the remote server researches something
     @Remote
     public static void researched(Content content){
-        if(!(content instanceof UnlockableContent u)) return;
+        if(!(content instanceof UnlockableContent)) return;
+        UnlockableContent u = (UnlockableContent) content;
 
         state.rules.researched.add(u.name);
         ui.hudfrag.showUnlock(u);

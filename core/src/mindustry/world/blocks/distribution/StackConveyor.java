@@ -200,7 +200,8 @@ public class StackConveyor extends Block implements Autotiler{
                 }
             }else{ //transfer
                 if(state != stateLoad || (items.total() >= getMaximumAccepted(lastItem))){
-                    if(front() instanceof StackConveyorBuild e && e.team == team){
+                    if(front() instanceof StackConveyorBuild && ((StackConveyorBuild) front()).team == team){
+                        StackConveyorBuild e = (StackConveyorBuild) front();
                         // sleep if its occupied
                         if(e.link == -1){
                             e.items.add(items);
@@ -220,7 +221,8 @@ public class StackConveyor extends Block implements Autotiler{
 
         @Override
         public void overwrote(Seq<Building> builds){
-            if(builds.first() instanceof ConveyorBuild build){
+            if(builds.first() instanceof ConveyorBuild){
+                ConveyorBuild build = (ConveyorBuild) builds.first();
                 Item item = build.items.first();
                 if(item != null){
                     handleStack(item, build.items.get(item), null);

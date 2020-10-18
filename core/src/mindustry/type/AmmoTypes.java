@@ -44,7 +44,7 @@ public class AmmoTypes implements ContentList{
             Tile closest = Vars.indexer.findClosestFlag(unit.x, unit.y, unit.team, BlockFlag.powerRes);
 
             if(closest != null && closest.build != null && unit.within(closest.build, range) && closest.build.power != null){
-                var build = closest.build;
+                Building build = closest.build;
 
                 if(build.block.consumes.hasPower() && build.block.consumes.getPower().buffered){
                     float amount = closest.build.power.status * build.block.consumes.getPower().capacity;

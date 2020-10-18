@@ -28,8 +28,11 @@ public class NetworkIO{
                 state.rules.researched.clear();
                 for(ContentType type : ContentType.all){
                     for(Content c : content.getBy(type)){
-                        if(c instanceof UnlockableContent u && u.unlocked() && TechTree.get(u) != null){
-                            state.rules.researched.add(u.name);
+                        if(c instanceof UnlockableContent) {
+                            UnlockableContent u = (UnlockableContent) c;
+                            if (u.unlocked() && TechTree.get(u) != null){
+                                state.rules.researched.add(u.name);
+                            }
                         }
                     }
                 }

@@ -179,6 +179,8 @@ public class Renderer implements ApplicationListener{
     }
 
     void updateShake(float scale){
+        return; // Don't shake the camera
+        /*
         if(shaketime > 0){
             float intensity = shakeIntensity * (settings.getInt("screenshake", 4) / 4f) * scale;
             camera.position.add(Mathf.range(intensity), Mathf.range(intensity));
@@ -187,7 +189,7 @@ public class Renderer implements ApplicationListener{
             shakeIntensity = Mathf.clamp(shakeIntensity, 0f, 100f);
         }else{
             shakeIntensity = 0f;
-        }
+        }*/
     }
 
     public void draw(){
@@ -302,7 +304,7 @@ public class Renderer implements ApplicationListener{
 
     public void clampScale(){
         float s = Scl.scl(1f);
-        targetscale = Mathf.clamp(targetscale, minScale(), Math.round(s * 6));
+        targetscale = Mathf.clamp(targetscale, s * 0.5f, Math.round(s * 6));
     }
 
     public float getDisplayScale(){

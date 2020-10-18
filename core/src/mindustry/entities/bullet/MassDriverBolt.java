@@ -36,10 +36,11 @@ public class MassDriverBolt extends BulletType{
     @Override
     public void update(Bullet b){
         //data MUST be an instance of DriverBulletData
-        if(!(b.data() instanceof DriverBulletData data)){
+        if(!(b.data() instanceof DriverBulletData)){
             hit(b);
             return;
         }
+        DriverBulletData data = (DriverBulletData) b.data();
 
         float hitDst = 7f;
 
@@ -81,7 +82,8 @@ public class MassDriverBolt extends BulletType{
     public void despawned(Bullet b){
         super.despawned(b);
 
-        if(!(b.data() instanceof DriverBulletData data)) return;
+        if(!(b.data() instanceof DriverBulletData)) return;
+        DriverBulletData data = (DriverBulletData) b.data();
 
         for(int i = 0; i < data.items.length; i++){
             int amountDropped = Mathf.random(0, data.items[i]);

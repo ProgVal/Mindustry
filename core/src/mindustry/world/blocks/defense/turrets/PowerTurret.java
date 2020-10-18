@@ -36,11 +36,11 @@ public class PowerTurret extends Turret{
 
         @Override
         public double sense(LAccess sensor){
-            return switch(sensor){
-                case ammo -> power.status;
-                case ammoCapacity -> 1;
-                default -> super.sense(sensor);
-            };
+            switch(sensor){
+                case ammo: return power.status;
+                case ammoCapacity: return 1;
+                default: return super.sense(sensor);
+            }
         }
 
         @Override

@@ -174,7 +174,7 @@ allprojects{
 
     tasks.withType(JavaCompile){
         targetCompatibility = 8
-        sourceCompatibility = 14
+        sourceCompatibility = 11
         options.encoding = "UTF-8"
         options.compilerArgs += ["-Xlint:deprecation"]
     }
@@ -203,7 +203,7 @@ configure(subprojects - project(":annotations")){
         options{
             addStringOption('Xdoclint:none', '-quiet')
             addBooleanOption('-enable-preview', true)
-            addStringOption('-release', '14')
+            addStringOption('-release', '11')
         }
     }
 }
